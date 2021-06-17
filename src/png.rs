@@ -4,7 +4,7 @@ use std::str::FromStr;
 
 use crate::{chunk::Chunk, chunk_type::ChunkType, Error};
 
-struct Png {
+pub struct Png {
     chunks: Vec<Chunk>,
 }
 
@@ -15,11 +15,11 @@ impl Png {
         Self { chunks }
     }
 
-    fn append_chunk(&mut self, chunk: Chunk) {
+    pub fn append_chunk(&mut self, chunk: Chunk) {
         self.chunks.push(chunk)
     }
 
-    fn remove_chunk(&mut self, chunk_type: &str) -> Result<Chunk, Error> {
+    pub fn remove_chunk(&mut self, chunk_type: &str) -> Result<Chunk, Error> {
         let chunk_type = ChunkType::from_str(chunk_type)?;
         // Use drain_filter once stabled
         let mut i = 0;
@@ -40,14 +40,14 @@ impl Png {
         self.chunks.as_slice()
     }
 
-    fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
+    pub fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
         let chunk_type = ChunkType::from_str(chunk_type).ok()?;
         self.chunks()
             .iter()
             .find(|&chunk| chunk.chunk_type() == chunk_type)
     }
 
-    fn as_bytes(&self) -> Vec<u8> {
+    pub fn as_bytes(&self) -> Vec<u8> {
         let chunks_bytes = self
             .chunks()
             .iter()

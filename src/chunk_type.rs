@@ -1,13 +1,12 @@
 use std::{convert::TryFrom, fmt::Display, fmt::Formatter, str::FromStr};
 
-// http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html
-// Bit 5 of the byte, which is 32 (2 ^ 5)
-const BIT_5: u8 = 0b0010_0000;
-
 #[derive(Debug, PartialEq, Eq)]
 pub struct ChunkType([u8; 4]);
 
 impl ChunkType {
+    // Bit 5 of the byte, which is 32 (2 ^ 5)
+    const BIT_5: u8 = 0b0010_0000;
+
     pub fn bytes(&self) -> [u8; 4] {
         self.0
     }
@@ -17,19 +16,19 @@ impl ChunkType {
     }
 
     fn is_critical(&self) -> bool {
-        self.bytes()[0] & BIT_5 == 0
+        self.bytes()[0] & ChunkType::BIT_5 == 0
     }
 
     fn is_public(&self) -> bool {
-        self.bytes()[1] & BIT_5 == 0
+        self.bytes()[1] & ChunkType::BIT_5 == 0
     }
 
     fn is_reserved_bit_valid(&self) -> bool {
-        self.bytes()[2] & BIT_5 == 0
+        self.bytes()[2] & ChunkType::BIT_5 == 0
     }
 
     fn is_safe_to_copy(&self) -> bool {
-        self.bytes()[3] & BIT_5 != 0
+        self.bytes()[3] & ChunkType::BIT_5 != 0
     }
 }
 
