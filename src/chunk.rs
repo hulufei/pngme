@@ -1,7 +1,7 @@
 use crc::crc32::checksum_ieee;
 
-use crate::chunk_type::ChunkType;
-use std::{convert::TryFrom, fmt::Display, io::Read, string::FromUtf8Error};
+use crate::{chunk_type::ChunkType, Error};
+use std::{convert::TryFrom, fmt::Display, string::FromUtf8Error};
 
 pub struct Chunk(Vec<u8>);
 
@@ -34,7 +34,7 @@ impl Chunk {
     }
 
     pub fn chunk_type(&self) -> ChunkType {
-        let mut bytes: [u8; 4] = Default::default();
+        let mut bytes = [0; 4];
         bytes.copy_from_slice(&self.0[4..8]);
         ChunkType::try_from(bytes).expect("Invalid chunk type")
     }
@@ -59,7 +59,7 @@ impl Chunk {
 }
 
 impl TryFrom<&[u8]> for Chunk {
-    type Error = &'static str;
+    type Error = Error;
 
     fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
         let (remainder, crc) = bytes.split_at(bytes.len() - 4);
@@ -69,7 +69,7 @@ impl TryFrom<&[u8]> for Chunk {
         if checksum_ieee(&remainder[4..]) == crc {
             Ok(Chunk(bytes.iter().copied().collect()))
         } else {
-            Err("Invalid crc checks")
+            Err("Invalid crc checks")?
         }
     }
 }

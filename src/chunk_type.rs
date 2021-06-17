@@ -1,8 +1,10 @@
+use crate::Error;
 use std::{convert::TryFrom, fmt::Display, fmt::Formatter, str::FromStr};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct ChunkType([u8; 4]);
 
+#[allow(dead_code)]
 impl ChunkType {
     // Bit 5 of the byte, which is 32 (2 ^ 5)
     const BIT_5: u8 = 0b0010_0000;
@@ -33,27 +35,27 @@ impl ChunkType {
 }
 
 impl TryFrom<[u8; 4]> for ChunkType {
-    type Error = &'static str;
+    type Error = Error;
 
     fn try_from(value: [u8; 4]) -> Result<Self, Self::Error> {
         if value.iter().all(|c| c.is_ascii_alphabetic()) {
             Ok(Self(value))
         } else {
-            Err("type codes are restricted to consist of uppercase and lowercase ASCII letters (A-Z and a-z)")
+            Err("type codes are restricted to consist of uppercase and lowercase ASCII letters (A-Z and a-z)")?
         }
     }
 }
 
 impl FromStr for ChunkType {
-    type Err = &'static str;
+    type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.len() == 4 {
-            let mut arr: [u8; 4] = Default::default();
+            let mut arr = [0; 4];
             arr.copy_from_slice(s.as_bytes());
             Self::try_from(arr)
         } else {
-            Err("type codes are restricted to 4 characters")
+            Err("type codes are restricted to 4 characters")?
         }
     }
 }
